@@ -13,11 +13,11 @@ import { createFileRoute } from '@tanstack/react-router';
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root';
+import { Route as IndexImport } from './routes/index';
 
 // Create Virtual Routes
 
 const SlugLazyImport = createFileRoute('/$slug')();
-const IndexLazyImport = createFileRoute('/')();
 
 // Create/Update Routes
 
@@ -27,11 +27,11 @@ const SlugLazyRoute = SlugLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/$slug.lazy').then((d) => d.Route));
 
-const IndexLazyRoute = IndexLazyImport.update({
+const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route));
+} as any);
 
 // Populate the FileRoutesByPath interface
 
@@ -41,7 +41,7 @@ declare module '@tanstack/react-router' {
       id: '/';
       path: '/';
       fullPath: '/';
-      preLoaderRoute: typeof IndexLazyImport;
+      preLoaderRoute: typeof IndexImport;
       parentRoute: typeof rootRoute;
     };
     '/$slug': {
@@ -57,18 +57,18 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexLazyRoute;
+  '/': typeof IndexRoute;
   '/$slug': typeof SlugLazyRoute;
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexLazyRoute;
+  '/': typeof IndexRoute;
   '/$slug': typeof SlugLazyRoute;
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute;
-  '/': typeof IndexLazyRoute;
+  '/': typeof IndexRoute;
   '/$slug': typeof SlugLazyRoute;
 }
 
@@ -82,12 +82,12 @@ export interface FileRouteTypes {
 }
 
 export interface RootRouteChildren {
-  IndexLazyRoute: typeof IndexLazyRoute;
+  IndexRoute: typeof IndexRoute;
   SlugLazyRoute: typeof SlugLazyRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexLazyRoute: IndexLazyRoute,
+  IndexRoute: IndexRoute,
   SlugLazyRoute: SlugLazyRoute,
 };
 
@@ -106,7 +106,7 @@ export const routeTree = rootRoute
       ]
     },
     "/": {
-      "filePath": "index.lazy.tsx"
+      "filePath": "index.tsx"
     },
     "/$slug": {
       "filePath": "$slug.lazy.tsx"

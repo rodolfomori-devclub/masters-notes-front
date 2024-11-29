@@ -1,6 +1,7 @@
 import './index.css';
 
 import { RouterProvider, createRouter } from '@tanstack/react-router';
+import { NuqsAdapter } from 'nuqs/adapters/react';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 
@@ -19,7 +20,9 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <NuqsAdapter>
+        <RouterProvider router={router} />
+      </NuqsAdapter>
     </StrictMode>,
   );
 }
