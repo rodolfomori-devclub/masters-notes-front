@@ -19,7 +19,7 @@ export type Article = {
 
 export type FetchArticlesParams = {
   title?: string;
-  tags?: string[];
+  tags?: string;
   page?: number;
 };
 

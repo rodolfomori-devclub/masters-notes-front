@@ -23,7 +23,7 @@ export function ArticleCard({
   tags,
   title,
 }: ArticleCardProps) {
-  // TODO Adicionar quantiade de likes
+  // TODO Adicionar quantidade de likes
 
   return (
     <Card>
