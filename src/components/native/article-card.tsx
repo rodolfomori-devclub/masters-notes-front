@@ -1,3 +1,5 @@
+import { formatDate } from '@/lib/format-date';
+import { MarkdownViewer } from 'react-github-markdown';
 import { Badge } from '../ui/badge';
 import {
   Card,
@@ -11,9 +13,11 @@ import {
 type ArticleCardProps = {
   title: string;
   tags: string[];
+  likes: string[];
   subtitle: string;
   authorName: string;
   createdAt: Date;
+  onClick: () => void;
 };
 
 export function ArticleCard({
@@ -21,12 +25,14 @@ export function ArticleCard({
   createdAt,
   subtitle,
   tags,
+  likes,
   title,
+  onClick,
 }: ArticleCardProps) {
-  // TODO Adicionar quantidade de likes
-
   return (
-    <Card>
+    <Card
+      onClick={onClick}
+      className="cursor-pointer hover:shadow-lg transition-shadow">
       <CardHeader className="space-y-4">
         <CardDescription className="space-x-3">
           {tags.map((tag, index) => (
@@ -37,13 +43,14 @@ export function ArticleCard({
         </CardDescription>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent>{subtitle}</CardContent>
-      <CardFooter>
-        {authorName},{' '}
-        {new Intl.DateTimeFormat('pt-BR', {
-          dateStyle: 'medium',
-          timeZone: 'America/Sao_Paulo',
-        }).format(createdAt)}
+      <CardContent>
+        {<MarkdownViewer isDarkTheme={false} value={subtitle} />}
+      </CardContent>
+      <CardFooter className="flex justify-between font-light text-sm">
+        <p>
+          {authorName}, {formatDate(createdAt)}
+        </p>
+        <p>{likes.length} likes</p>
       </CardFooter>
     </Card>
   );

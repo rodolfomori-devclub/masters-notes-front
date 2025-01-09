@@ -1,27 +1,9 @@
-import { type PaginatedAPIResponse, api } from '.';
-
-export type Author = {
-  _id: string;
-  fullName: string;
-};
-
-export type Article = {
-  _id: string;
-  slug: string;
-  title: string;
-  subtitle: string;
-  tags: string[];
-  author: Author;
-  likes: string[];
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type FetchArticlesParams = {
-  title?: string;
-  tags?: string;
-  page?: number;
-};
+import {
+  type Article,
+  type FetchArticlesParams,
+  type PaginatedAPIResponse,
+  api,
+} from '.';
 
 export async function fetchArticles(
   params?: FetchArticlesParams,

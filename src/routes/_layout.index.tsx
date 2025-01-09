@@ -2,13 +2,9 @@ import { ArticleCard } from '@/components/native/article-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { Page } from '@/services';
-import {
-  type Article,
-  type FetchArticlesParams,
-  fetchArticles,
-} from '@/services/fetch-articles';
-import { createFileRoute } from '@tanstack/react-router';
+import type { Article, FetchArticlesParams, Page } from '@/services';
+import { fetchArticles } from '@/services/fetch-articles';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import {
   ChevronLeft,
   ChevronRight,
@@ -30,7 +26,7 @@ import {
   useState,
 } from 'react';
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute('/_layout/')({
   loaderDeps: ({ search }) => search as FetchArticlesParams,
   loader: ({ deps }) => {
     const { title, page, tags } = deps;
@@ -48,6 +44,7 @@ export const Route = createFileRoute('/')({
 
 function Index() {
   const loaderArticles = Route.useLoaderData();
+  const navigate = useNavigate();
 
   const [articles, setArticles] = useState<{ data: Article[]; page: Page }>(
     loaderArticles,
@@ -182,12 +179,14 @@ function Index() {
       <div className="flex flex-col gap-4">
         {articles.data.map((article) => (
           <ArticleCard
+            onClick={() => navigate({ to: `/${article.slug}` })}
             key={article._id}
             title={article.title}
             subtitle={article.subtitle}
             tags={article.tags}
             authorName={article.author.fullName}
             createdAt={new Date(article.createdAt)}
+            likes={article.likes}
           />
         ))}
       </div>

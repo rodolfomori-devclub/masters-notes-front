@@ -8,87 +8,127 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createFileRoute } from '@tanstack/react-router';
-
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root';
-import { Route as IndexImport } from './routes/index';
-
-// Create Virtual Routes
-
-const SlugLazyImport = createFileRoute('/$slug')();
+import { Route as LayoutImport } from './routes/_layout';
+import { Route as LayoutSlugImport } from './routes/_layout.$slug';
+import { Route as LayoutIndexImport } from './routes/_layout.index';
+import { Route as RegisterImport } from './routes/register';
 
 // Create/Update Routes
 
-const SlugLazyRoute = SlugLazyImport.update({
-  id: '/$slug',
-  path: '/$slug',
+const RegisterRoute = RegisterImport.update({
+  id: '/register',
+  path: '/register',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/$slug.lazy').then((d) => d.Route));
+} as any);
 
-const IndexRoute = IndexImport.update({
+const LayoutRoute = LayoutImport.update({
+  id: '/_layout',
+  getParentRoute: () => rootRoute,
+} as any);
+
+const LayoutIndexRoute = LayoutIndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => LayoutRoute,
+} as any);
+
+const LayoutSlugRoute = LayoutSlugImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => LayoutRoute,
 } as any);
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/';
-      path: '/';
-      fullPath: '/';
-      preLoaderRoute: typeof IndexImport;
+    '/_layout': {
+      id: '/_layout';
+      path: '';
+      fullPath: '';
+      preLoaderRoute: typeof LayoutImport;
       parentRoute: typeof rootRoute;
     };
-    '/$slug': {
-      id: '/$slug';
+    '/register': {
+      id: '/register';
+      path: '/register';
+      fullPath: '/register';
+      preLoaderRoute: typeof RegisterImport;
+      parentRoute: typeof rootRoute;
+    };
+    '/_layout/$slug': {
+      id: '/_layout/$slug';
       path: '/$slug';
       fullPath: '/$slug';
-      preLoaderRoute: typeof SlugLazyImport;
-      parentRoute: typeof rootRoute;
+      preLoaderRoute: typeof LayoutSlugImport;
+      parentRoute: typeof LayoutImport;
+    };
+    '/_layout/': {
+      id: '/_layout/';
+      path: '/';
+      fullPath: '/';
+      preLoaderRoute: typeof LayoutIndexImport;
+      parentRoute: typeof LayoutImport;
     };
   }
 }
 
 // Create and export the route tree
 
+interface LayoutRouteChildren {
+  LayoutSlugRoute: typeof LayoutSlugRoute;
+  LayoutIndexRoute: typeof LayoutIndexRoute;
+}
+
+const LayoutRouteChildren: LayoutRouteChildren = {
+  LayoutSlugRoute: LayoutSlugRoute,
+  LayoutIndexRoute: LayoutIndexRoute,
+};
+
+const LayoutRouteWithChildren =
+  LayoutRoute._addFileChildren(LayoutRouteChildren);
+
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute;
-  '/$slug': typeof SlugLazyRoute;
+  '': typeof LayoutRouteWithChildren;
+  '/register': typeof RegisterRoute;
+  '/$slug': typeof LayoutSlugRoute;
+  '/': typeof LayoutIndexRoute;
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute;
-  '/$slug': typeof SlugLazyRoute;
+  '/register': typeof RegisterRoute;
+  '/$slug': typeof LayoutSlugRoute;
+  '/': typeof LayoutIndexRoute;
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute;
-  '/': typeof IndexRoute;
-  '/$slug': typeof SlugLazyRoute;
+  '/_layout': typeof LayoutRouteWithChildren;
+  '/register': typeof RegisterRoute;
+  '/_layout/$slug': typeof LayoutSlugRoute;
+  '/_layout/': typeof LayoutIndexRoute;
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: '/' | '/$slug';
+  fullPaths: '' | '/register' | '/$slug' | '/';
   fileRoutesByTo: FileRoutesByTo;
-  to: '/' | '/$slug';
-  id: '__root__' | '/' | '/$slug';
+  to: '/register' | '/$slug' | '/';
+  id: '__root__' | '/_layout' | '/register' | '/_layout/$slug' | '/_layout/';
   fileRoutesById: FileRoutesById;
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  SlugLazyRoute: typeof SlugLazyRoute;
+  LayoutRoute: typeof LayoutRouteWithChildren;
+  RegisterRoute: typeof RegisterRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  SlugLazyRoute: SlugLazyRoute,
+  LayoutRoute: LayoutRouteWithChildren,
+  RegisterRoute: RegisterRoute,
 };
 
 export const routeTree = rootRoute
@@ -101,15 +141,27 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
-        "/$slug"
+        "/_layout",
+        "/register"
       ]
     },
-    "/": {
-      "filePath": "index.tsx"
+    "/_layout": {
+      "filePath": "_layout.tsx",
+      "children": [
+        "/_layout/$slug",
+        "/_layout/"
+      ]
     },
-    "/$slug": {
-      "filePath": "$slug.lazy.tsx"
+    "/register": {
+      "filePath": "register.tsx"
+    },
+    "/_layout/$slug": {
+      "filePath": "_layout.$slug.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/": {
+      "filePath": "_layout.index.tsx",
+      "parent": "/_layout"
     }
   }
 }
