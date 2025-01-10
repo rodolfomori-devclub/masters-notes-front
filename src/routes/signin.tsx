@@ -17,11 +17,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { registerUser } from '@/services/register-user';
-import {
-  type RegisterUserData,
-  registerUserSchema,
-} from '@/validators/register-user';
+import { signIn } from '@/services/signin';
+import { type SignInData, signInSchema } from '@/validators/signin';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { isAxiosError } from 'axios';
@@ -29,33 +26,33 @@ import { LoaderCircle } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-export const Route = createFileRoute('/register')({
-  component: Register,
+export const Route = createFileRoute('/signin')({
+  component: SignIn,
 });
 
-function Register() {
+function SignIn() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const form = useForm<RegisterUserData>({
+  const form = useForm<SignInData>({
     defaultValues: {
-      fullName: '',
       email: '',
       password: '',
-      confirmPassword: '',
     },
-    resolver: zodResolver(registerUserSchema),
+    resolver: zodResolver(signInSchema),
   });
 
-  const handleRegister = useCallback(async (data: RegisterUserData) => {
+  const handleSignIn = useCallback(async (data: SignInData) => {
     try {
       setError(null);
       setIsLoading(true);
 
-      await registerUser(data);
+      const response = await signIn(data);
 
-      navigate({ to: '/signin' });
+      // TODO Salvar dodos do usuário no localStorage e no estado global
+      console.log(response);
+      navigate({ to: '/' });
     } catch (err) {
       if (isAxiosError(err)) {
         setError(err.response?.data.message);
@@ -70,31 +67,15 @@ function Register() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <Logo />
-          <CardTitle>Create a new account</CardTitle>
-          <CardDescription>
-            Complete fields below to register a new account.
-          </CardDescription>
+          <CardTitle>SignIn</CardTitle>
+          <CardDescription>Enter your credentials to sign in.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(handleRegister)}
+              onSubmit={form.handleSubmit(handleSignIn)}
               noValidate
               className="space-y-4">
-              <FormField
-                control={form.control}
-                name="fullName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               <FormField
                 control={form.control}
                 name="email"
@@ -128,23 +109,9 @@ function Register() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" autoCapitalize="off" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               <Button disabled={isLoading} type="submit" className="w-full">
                 {isLoading && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                Register
+                SignIn
               </Button>
             </form>
           </Form>
@@ -153,9 +120,9 @@ function Register() {
         </CardContent>
         <CardFooter>
           <p className="font-light text-sm">
-            Do you have an account?{' '}
-            <Link to="/signin" className="underline">
-              SignIn.
+            Don't you have an account?{' '}
+            <Link to="/register" className="underline">
+              Register.
             </Link>
           </p>
         </CardFooter>

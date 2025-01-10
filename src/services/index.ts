@@ -36,6 +36,12 @@ export type FetchArticlesParams = {
   page?: number;
 };
 
+export type SignedUser = {
+  token: string;
+  fullName: string;
+  email: string;
+};
+
 export const api = axios.create({
   baseURL: 'http://localhost:4000',
 });

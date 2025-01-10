@@ -15,8 +15,15 @@ import { Route as LayoutImport } from './routes/_layout';
 import { Route as LayoutSlugImport } from './routes/_layout.$slug';
 import { Route as LayoutIndexImport } from './routes/_layout.index';
 import { Route as RegisterImport } from './routes/register';
+import { Route as SigninImport } from './routes/signin';
 
 // Create/Update Routes
+
+const SigninRoute = SigninImport.update({
+  id: '/signin',
+  path: '/signin',
+  getParentRoute: () => rootRoute,
+} as any);
 
 const RegisterRoute = RegisterImport.update({
   id: '/register',
@@ -59,6 +66,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterImport;
       parentRoute: typeof rootRoute;
     };
+    '/signin': {
+      id: '/signin';
+      path: '/signin';
+      fullPath: '/signin';
+      preLoaderRoute: typeof SigninImport;
+      parentRoute: typeof rootRoute;
+    };
     '/_layout/$slug': {
       id: '/_layout/$slug';
       path: '/$slug';
@@ -94,12 +108,14 @@ const LayoutRouteWithChildren =
 export interface FileRoutesByFullPath {
   '': typeof LayoutRouteWithChildren;
   '/register': typeof RegisterRoute;
+  '/signin': typeof SigninRoute;
   '/$slug': typeof LayoutSlugRoute;
   '/': typeof LayoutIndexRoute;
 }
 
 export interface FileRoutesByTo {
   '/register': typeof RegisterRoute;
+  '/signin': typeof SigninRoute;
   '/$slug': typeof LayoutSlugRoute;
   '/': typeof LayoutIndexRoute;
 }
@@ -108,27 +124,36 @@ export interface FileRoutesById {
   __root__: typeof rootRoute;
   '/_layout': typeof LayoutRouteWithChildren;
   '/register': typeof RegisterRoute;
+  '/signin': typeof SigninRoute;
   '/_layout/$slug': typeof LayoutSlugRoute;
   '/_layout/': typeof LayoutIndexRoute;
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: '' | '/register' | '/$slug' | '/';
+  fullPaths: '' | '/register' | '/signin' | '/$slug' | '/';
   fileRoutesByTo: FileRoutesByTo;
-  to: '/register' | '/$slug' | '/';
-  id: '__root__' | '/_layout' | '/register' | '/_layout/$slug' | '/_layout/';
+  to: '/register' | '/signin' | '/$slug' | '/';
+  id:
+    | '__root__'
+    | '/_layout'
+    | '/register'
+    | '/signin'
+    | '/_layout/$slug'
+    | '/_layout/';
   fileRoutesById: FileRoutesById;
 }
 
 export interface RootRouteChildren {
   LayoutRoute: typeof LayoutRouteWithChildren;
   RegisterRoute: typeof RegisterRoute;
+  SigninRoute: typeof SigninRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
   LayoutRoute: LayoutRouteWithChildren,
   RegisterRoute: RegisterRoute,
+  SigninRoute: SigninRoute,
 };
 
 export const routeTree = rootRoute
@@ -142,7 +167,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/_layout",
-        "/register"
+        "/register",
+        "/signin"
       ]
     },
     "/_layout": {
@@ -154,6 +180,9 @@ export const routeTree = rootRoute
     },
     "/register": {
       "filePath": "register.tsx"
+    },
+    "/signin": {
+      "filePath": "signin.tsx"
     },
     "/_layout/$slug": {
       "filePath": "_layout.$slug.tsx",
