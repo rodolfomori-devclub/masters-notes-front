@@ -37,6 +37,7 @@ export type FetchArticlesParams = {
 };
 
 export type SignedUser = {
+  id: string;
   token: string;
   fullName: string;
   email: string;

@@ -13,7 +13,9 @@
 import { Route as rootRoute } from './routes/__root';
 import { Route as LayoutImport } from './routes/_layout';
 import { Route as LayoutSlugImport } from './routes/_layout.$slug';
+import { Route as LayoutSlugEditImport } from './routes/_layout.$slug.edit';
 import { Route as LayoutIndexImport } from './routes/_layout.index';
+import { Route as LayoutNewImport } from './routes/_layout.new';
 import { Route as RegisterImport } from './routes/register';
 import { Route as SigninImport } from './routes/signin';
 
@@ -42,10 +44,22 @@ const LayoutIndexRoute = LayoutIndexImport.update({
   getParentRoute: () => LayoutRoute,
 } as any);
 
+const LayoutNewRoute = LayoutNewImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => LayoutRoute,
+} as any);
+
 const LayoutSlugRoute = LayoutSlugImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => LayoutRoute,
+} as any);
+
+const LayoutSlugEditRoute = LayoutSlugEditImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => LayoutSlugRoute,
 } as any);
 
 // Populate the FileRoutesByPath interface
@@ -80,6 +94,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutSlugImport;
       parentRoute: typeof LayoutImport;
     };
+    '/_layout/new': {
+      id: '/_layout/new';
+      path: '/new';
+      fullPath: '/new';
+      preLoaderRoute: typeof LayoutNewImport;
+      parentRoute: typeof LayoutImport;
+    };
     '/_layout/': {
       id: '/_layout/';
       path: '/';
@@ -87,18 +108,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutIndexImport;
       parentRoute: typeof LayoutImport;
     };
+    '/_layout/$slug/edit': {
+      id: '/_layout/$slug/edit';
+      path: '/edit';
+      fullPath: '/$slug/edit';
+      preLoaderRoute: typeof LayoutSlugEditImport;
+      parentRoute: typeof LayoutSlugImport;
+    };
   }
 }
 
 // Create and export the route tree
 
+interface LayoutSlugRouteChildren {
+  LayoutSlugEditRoute: typeof LayoutSlugEditRoute;
+}
+
+const LayoutSlugRouteChildren: LayoutSlugRouteChildren = {
+  LayoutSlugEditRoute: LayoutSlugEditRoute,
+};
+
+const LayoutSlugRouteWithChildren = LayoutSlugRoute._addFileChildren(
+  LayoutSlugRouteChildren,
+);
+
 interface LayoutRouteChildren {
-  LayoutSlugRoute: typeof LayoutSlugRoute;
+  LayoutSlugRoute: typeof LayoutSlugRouteWithChildren;
+  LayoutNewRoute: typeof LayoutNewRoute;
   LayoutIndexRoute: typeof LayoutIndexRoute;
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
-  LayoutSlugRoute: LayoutSlugRoute,
+  LayoutSlugRoute: LayoutSlugRouteWithChildren,
+  LayoutNewRoute: LayoutNewRoute,
   LayoutIndexRoute: LayoutIndexRoute,
 };
 
@@ -109,15 +151,19 @@ export interface FileRoutesByFullPath {
   '': typeof LayoutRouteWithChildren;
   '/register': typeof RegisterRoute;
   '/signin': typeof SigninRoute;
-  '/$slug': typeof LayoutSlugRoute;
+  '/$slug': typeof LayoutSlugRouteWithChildren;
+  '/new': typeof LayoutNewRoute;
   '/': typeof LayoutIndexRoute;
+  '/$slug/edit': typeof LayoutSlugEditRoute;
 }
 
 export interface FileRoutesByTo {
   '/register': typeof RegisterRoute;
   '/signin': typeof SigninRoute;
-  '/$slug': typeof LayoutSlugRoute;
+  '/$slug': typeof LayoutSlugRouteWithChildren;
+  '/new': typeof LayoutNewRoute;
   '/': typeof LayoutIndexRoute;
+  '/$slug/edit': typeof LayoutSlugEditRoute;
 }
 
 export interface FileRoutesById {
@@ -125,22 +171,33 @@ export interface FileRoutesById {
   '/_layout': typeof LayoutRouteWithChildren;
   '/register': typeof RegisterRoute;
   '/signin': typeof SigninRoute;
-  '/_layout/$slug': typeof LayoutSlugRoute;
+  '/_layout/$slug': typeof LayoutSlugRouteWithChildren;
+  '/_layout/new': typeof LayoutNewRoute;
   '/_layout/': typeof LayoutIndexRoute;
+  '/_layout/$slug/edit': typeof LayoutSlugEditRoute;
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: '' | '/register' | '/signin' | '/$slug' | '/';
+  fullPaths:
+    | ''
+    | '/register'
+    | '/signin'
+    | '/$slug'
+    | '/new'
+    | '/'
+    | '/$slug/edit';
   fileRoutesByTo: FileRoutesByTo;
-  to: '/register' | '/signin' | '/$slug' | '/';
+  to: '/register' | '/signin' | '/$slug' | '/new' | '/' | '/$slug/edit';
   id:
     | '__root__'
     | '/_layout'
     | '/register'
     | '/signin'
     | '/_layout/$slug'
-    | '/_layout/';
+    | '/_layout/new'
+    | '/_layout/'
+    | '/_layout/$slug/edit';
   fileRoutesById: FileRoutesById;
 }
 
@@ -175,6 +232,7 @@ export const routeTree = rootRoute
       "filePath": "_layout.tsx",
       "children": [
         "/_layout/$slug",
+        "/_layout/new",
         "/_layout/"
       ]
     },
@@ -186,11 +244,22 @@ export const routeTree = rootRoute
     },
     "/_layout/$slug": {
       "filePath": "_layout.$slug.tsx",
+      "parent": "/_layout",
+      "children": [
+        "/_layout/$slug/edit"
+      ]
+    },
+    "/_layout/new": {
+      "filePath": "_layout.new.tsx",
       "parent": "/_layout"
     },
     "/_layout/": {
       "filePath": "_layout.index.tsx",
       "parent": "/_layout"
+    },
+    "/_layout/$slug/edit": {
+      "filePath": "_layout.$slug.edit.tsx",
+      "parent": "/_layout/$slug"
     }
   }
 }

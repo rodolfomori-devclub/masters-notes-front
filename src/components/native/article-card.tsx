@@ -1,4 +1,5 @@
 import { formatDate } from '@/lib/format-date';
+import { NotebookPen } from 'lucide-react';
 import { MarkdownViewer } from 'react-github-markdown';
 import { Badge } from '../ui/badge';
 import {
@@ -18,6 +19,7 @@ type ArticleCardProps = {
   authorName: string;
   createdAt: Date;
   onClick: () => void;
+  belongsToLoggedUser?: boolean;
 };
 
 export function ArticleCard({
@@ -28,6 +30,7 @@ export function ArticleCard({
   likes,
   title,
   onClick,
+  belongsToLoggedUser = false,
 }: ArticleCardProps) {
   return (
     <Card
@@ -47,7 +50,10 @@ export function ArticleCard({
         {<MarkdownViewer isDarkTheme={false} value={subtitle} />}
       </CardContent>
       <CardFooter className="flex justify-between font-light text-sm">
-        <p>
+        <p className="flex items-center">
+          {belongsToLoggedUser && (
+            <NotebookPen className="w-4 h-4 text-green-500 mr-2" />
+          )}
           {authorName}, {formatDate(createdAt)}
         </p>
         <p>{likes.length} likes</p>

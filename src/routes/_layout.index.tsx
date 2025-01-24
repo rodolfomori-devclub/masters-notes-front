@@ -2,8 +2,18 @@ import { ArticleCard } from '@/components/native/article-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { Article, FetchArticlesParams, Page } from '@/services';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { cn } from '@/lib/utils';
+import type {
+  Article,
+  FetchArticlesParams,
+  Page,
+  PaginatedAPIResponse,
+} from '@/services';
 import { fetchArticles } from '@/services/fetch-articles';
+import { fetchMyArticles } from '@/services/fetch-my-articles';
+import { useUserStore } from '@/stores/use-user-store';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import {
   ChevronLeft,
@@ -45,6 +55,7 @@ export const Route = createFileRoute('/_layout/')({
 function Index() {
   const loaderArticles = Route.useLoaderData();
   const navigate = useNavigate();
+  const { user } = useUserStore();
 
   const [articles, setArticles] = useState<{ data: Article[]; page: Page }>(
     loaderArticles,
@@ -61,6 +72,7 @@ function Index() {
 
   const titleInputRef = useRef<HTMLInputElement>(null);
   const tagsInputRef = useRef<HTMLInputElement>(null);
+  const switchInputRef = useRef<HTMLButtonElement>(null);
 
   async function addTags() {
     if (!tagsInputRef.current || !tagsInputRef.current.value.length) {
@@ -86,13 +98,26 @@ function Index() {
     async (event?: FormEvent<HTMLFormElement>, newPage?: number) => {
       event?.preventDefault();
 
+      const isOnlyMyArticles =
+        switchInputRef.current?.getAttribute('data-state') === 'checked';
+
       const title = titleInputRef.current?.value;
 
-      const data = await fetchArticles({
+      let data: PaginatedAPIResponse<Article[]> = {} as PaginatedAPIResponse<
+        Article[]
+      >;
+
+      const filters = {
         title,
         tags: tags.join(','),
         page: event ? 1 : (newPage ?? page),
-      });
+      };
+
+      if (isOnlyMyArticles) {
+        data = await fetchMyArticles(user?.token, filters);
+      } else {
+        data = await fetchArticles(filters);
+      }
 
       setArticles(data);
 
@@ -169,10 +194,21 @@ function Index() {
               {tags.length > 3 && <Badge>{`+ ${tags.length - 3}`}</Badge>}
             </div>
           </div>
-          <Button type="submit" className="w-fit ml-auto">
-            <Search className="h-4 w-4 mr-1" />
-            Search
-          </Button>
+          <div className="flex items-center justify-between">
+            {user?.token && (
+              <div className="flex items-center gap-2">
+                <Switch ref={switchInputRef} />
+                <Label>Only my articles</Label>
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              className={cn('w-fit', !user?.token && 'ml-auto')}>
+              <Search className="h-4 w-4" />
+              Search
+            </Button>
+          </div>
         </div>
       </form>
 
@@ -187,6 +223,7 @@ function Index() {
             authorName={article.author.fullName}
             createdAt={new Date(article.createdAt)}
             likes={article.likes}
+            belongsToLoggedUser={article.author._id === user.id}
           />
         ))}
       </div>

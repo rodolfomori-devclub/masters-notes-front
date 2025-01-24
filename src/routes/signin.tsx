@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { signIn } from '@/services/signin';
+import { useUserStore } from '@/stores/use-user-store';
 import { type SignInData, signInSchema } from '@/validators/signin';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
@@ -32,6 +33,7 @@ export const Route = createFileRoute('/signin')({
 
 function SignIn() {
   const navigate = useNavigate();
+  const { setUser } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,8 +52,7 @@ function SignIn() {
 
       const response = await signIn(data);
 
-      // TODO Salvar dodos do usuário no localStorage e no estado global
-      console.log(response);
+      setUser(response);
       navigate({ to: '/' });
     } catch (err) {
       if (isAxiosError(err)) {
