@@ -213,19 +213,29 @@ function Index() {
       </form>
 
       <div className="flex flex-col gap-4">
-        {articles.data.map((article) => (
-          <ArticleCard
-            onClick={() => navigate({ to: `/${article.slug}` })}
-            key={article._id}
-            title={article.title}
-            subtitle={article.subtitle}
-            tags={article.tags}
-            authorName={article.author.fullName}
-            createdAt={new Date(article.createdAt)}
-            likes={article.likes}
-            belongsToLoggedUser={article.author._id === user.id}
-          />
-        ))}
+        {articles.data.map((article) => {
+          const belongsToLoggedUser = article.author._id === user?.id;
+
+          return (
+            <ArticleCard
+              onClick={() =>
+                navigate({
+                  to: belongsToLoggedUser
+                    ? `/${article.slug}/edit`
+                    : `/${article.slug}/edit`,
+                })
+              }
+              key={article._id}
+              title={article.title}
+              subtitle={article.subtitle}
+              tags={article.tags}
+              authorName={article.author.fullName}
+              createdAt={new Date(article.createdAt)}
+              likes={article.likes}
+              belongsToLoggedUser={belongsToLoggedUser}
+            />
+          );
+        })}
       </div>
 
       <div className="mt-2 flex w-full justify-center gap-2 items-center mx-auto">

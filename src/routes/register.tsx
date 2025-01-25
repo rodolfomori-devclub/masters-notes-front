@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { registerUser } from '@/services/register-user';
+import { useUserStore } from '@/stores/use-user-store';
 import {
   type RegisterUserData,
   registerUserSchema,
@@ -35,6 +36,12 @@ export const Route = createFileRoute('/register')({
 
 function Register() {
   const navigate = useNavigate();
+  const { user } = useUserStore();
+
+  if (user?.token) {
+    navigate({ to: '/' });
+  }
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

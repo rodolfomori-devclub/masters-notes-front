@@ -2,7 +2,12 @@ import { Logo } from '@/components/native/logo';
 import { Button } from '@/components/ui/button';
 import type { SignedUser } from '@/services';
 import { useUserStore } from '@/stores/use-user-store';
-import { Outlet, createFileRoute, useNavigate } from '@tanstack/react-router';
+import {
+  Link,
+  Outlet,
+  createFileRoute,
+  useNavigate,
+} from '@tanstack/react-router';
 import { LogIn, LogOut } from 'lucide-react';
 import { useCallback } from 'react';
 
@@ -38,8 +43,13 @@ function Layout() {
         {user?.token && (
           <div className="flex items-center gap-2">
             <p className="text-sm font-light">
-              Olá, {user.fullName.split(' ').at(0)}
+              Hello, {user.fullName.split(' ').at(0)}
             </p>
+            <Link
+              className="text-sm hover:underline font-light text-sky-800"
+              to="/new">
+              Create article
+            </Link>
             <Button variant="link" size="icon" onClick={handleSignOut}>
               <LogOut className="h-4 w-4 text-red-500" />
             </Button>

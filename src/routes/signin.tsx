@@ -33,7 +33,12 @@ export const Route = createFileRoute('/signin')({
 
 function SignIn() {
   const navigate = useNavigate();
-  const { setUser } = useUserStore();
+  const { setUser, user } = useUserStore();
+
+  if (user?.token) {
+    navigate({ to: '/' });
+  }
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
